@@ -29,7 +29,7 @@ public class WayPoint extends Node {
         neighbors.remove(wp);
     }
             
-    public ArrayList getNeighbors() {
+    public ArrayList<WayPoint> getNeighbors() {
         return neighbors;
     }
     
