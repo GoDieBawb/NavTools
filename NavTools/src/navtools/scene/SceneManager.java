@@ -13,6 +13,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import navtools.AppManager;
+import navtools.test.TestController;
 import navtools.util.FileWalker;
 
 /**
@@ -25,6 +26,7 @@ public class SceneManager  {
     private final FileWalker          fw;
     private final MeshEditControl     mec;
     private final WayPointEditControl wec;
+    private final TestController      tc;
     private Node                      scene;
     private Node                      navNode;
     
@@ -36,6 +38,7 @@ public class SceneManager  {
         initNavNode();
         mec = new MeshEditControl(this.app, scene);
         wec = new WayPointEditControl(this.app, scene);
+        tc  = new TestController(this.app, navNode);
     }
     
     private void loadScene(String path) {
@@ -90,6 +93,10 @@ public class SceneManager  {
                 wec.click();
                 break;
                 
+            case "Test":
+                tc.click();
+                break;  
+                
         }
         
     }
@@ -106,11 +113,19 @@ public class SceneManager  {
                 
             case "WayPoint":
                 wec.rightClick();
-                break;                
+                break;  
+                
+            case "Test":
+                tc.rightClick();
+                break;                  
             
         }
         
     } 
+    
+    public TestController getTestController() {
+        return tc;
+    }
     
     public void setShowLines(boolean show) {
         wec.setShowLines(show);
@@ -121,7 +136,7 @@ public class SceneManager  {
     }
     
     public void update(float tpf) {
-    
+        tc.update(tpf);
     }
     
 }

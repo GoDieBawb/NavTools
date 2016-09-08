@@ -10,13 +10,13 @@ import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import jme3tools.optimize.GeometryBatchFactory;
 import navtools.AppManager;
+import navtools.test.TestController;
 import org.lwjgl.opengl.Display;
 
 /**
@@ -32,10 +32,13 @@ public class Gui {
     private final float yOrigin;
     private Node        meshButton;
     private Node        pointButton;
+    private Node        testButton;
+    private Node        testSwitch;
     private BitmapText  infoText;
     private String      mode;
     private Node        lineSwitch;
     private boolean     showLines;
+    private boolean     testGo;
     
     public Gui(SimpleApplication app) {
         
@@ -123,6 +126,8 @@ public class Gui {
         
         infoText.setLocalTranslation(xPos, yPos, 1);
         
+        createTestButton();
+        createTestSwitch();
         createWayPointEditButton();
         createMeshButton();
         
@@ -152,6 +157,70 @@ public class Gui {
         pointButton.setLocalTranslation(xPos, yPos, 1);        
         
     }
+    
+    private void createTestButton() {
+        
+        BitmapFont font = app.getAssetManager().loadFont("Interface/Fonts/Default.fnt");
+        BitmapText text = new BitmapText(font, false);
+        testButton     = new Node();
+        Box  box        = new Box(Display.getWidth()/10, Display.getHeight()/20, 1);
+        Geometry g      = new Geometry("Box", box);
+        Material m      = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        m.setColor("Color", ColorRGBA.Magenta);
+        text.setText("Test");
+        m.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));
+        testButton.attachChild(g);
+        testButton.attachChild(text);
+        app.getGuiNode().attachChild(testButton);
+        g.setMaterial(m);
+        
+        float yPos = Display.getHeight() - Display.getHeight()/20 - Display.getHeight()/50;
+        float xPos = Display.getWidth() - Display.getWidth()/10 - Display.getWidth()/50;   
+             
+        text.setLocalTranslation(Display.getWidth()/20-text.getLineWidth(), Display.getHeight()/20 - text.getLineHeight(), 1);        
+        testButton.setLocalTranslation(xPos, yPos, 1);        
+        
+    }    
+    
+    private void createTestSwitch() {
+        
+        BitmapFont font = app.getAssetManager().loadFont("Interface/Fonts/Default.fnt");
+        BitmapText text = new BitmapText(font, false);
+        testSwitch      = new Node();
+        Box  box        = new Box(Display.getWidth()/10, Display.getHeight()/10, 1);
+        Geometry g      = new Geometry("Box", box);
+        Material m      = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        
+        Box  sbox       = new Box(Display.getWidth()/10/2, Display.getHeight()/10/5, 1);
+        Geometry sg     = new Geometry("Switch", sbox);
+        Material sm     = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");        
+        
+        sm.setColor("Color", ColorRGBA.Green);
+        sm.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));        
+        
+        m.setColor("Color", ColorRGBA.Gray);
+        m.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));
+        
+        text.setText("Test Go");
+        
+        testSwitch.attachChild(g);
+        testSwitch.attachChild(sg);
+        testSwitch.attachChild(text);
+        
+        g.setMaterial(m);
+        sg.setMaterial(sm);
+        
+        float yPos = Display.getHeight() - Display.getHeight()/10 - Display.getHeight()/50;
+        float xPos = 0 + Display.getWidth()/10 + Display.getWidth()/50;
+        
+        float syPos = Display.getHeight()/10/4;
+        
+        sg.setLocalTranslation(0, -syPos, 1);
+        
+        text.setLocalTranslation(Display.getWidth()/20-text.getLineWidth(), Display.getHeight()/20 + text.getLineHeight(), 1); 
+        testSwitch.setLocalTranslation(xPos, yPos, 1); 
+        
+    }    
     
     private void createMeshButton() {
         
@@ -228,7 +297,7 @@ public class Gui {
     
     public void click() {
     
-        Material red      = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        Material red    = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         Material blue   = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         red.setColor("Color", ColorRGBA.Red);
         blue.setColor("Color", ColorRGBA.Blue);  
@@ -236,7 +305,45 @@ public class Gui {
         red.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));
         blue.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));
         
-        if (buttonCheck(meshButton)) {
+        
+        if (buttonCheck(testButton)) {
+            
+            if (mode.equals("Test")) {
+                testSwitch.removeFromParent();
+                setMode("WayPoint");
+            }
+            
+            else {
+                setMode("Test");
+                app.getGuiNode().attachChild(testSwitch);
+            }
+        
+        }
+        
+        else if (buttonCheck(testSwitch)) {
+        
+            if (mode.equals("Test")) {
+            
+                TestController tc = app.getStateManager().getState(AppManager.class).getSceneManager().getTestController();
+                float yPos        = Display.getHeight()/10/4;
+                
+                if (testGo) {
+                    testSwitch.getChild("Switch").setLocalTranslation(0,-yPos,0);
+                    testGo = false;
+                    tc.stop();
+                }
+                
+                else {
+                    testSwitch.getChild("Switch").setLocalTranslation(0,yPos,0);
+                    testGo = true;
+                    tc.go();
+                }
+                        
+            }
+            
+        }        
+        
+        else if (buttonCheck(meshButton)) {
             
             if (mode.equals("Mesh"))
                 return;

@@ -17,7 +17,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import java.util.ArrayList;
-import navtools.mesh.WayPoint;
 
 /**
  *

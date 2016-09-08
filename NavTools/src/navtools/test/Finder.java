@@ -21,27 +21,33 @@ import navtools.mesh.WayPoint;
  */
 public class Finder extends Node {
     
-    private Vector3f moveDir;
+    private Vector3f moveDir, finalPoint;
     private ArrayList<WayPoint> badPoints  = new ArrayList();
     private ArrayList<WayPoint> goodPoints = new ArrayList();
     private ArrayList<WayPoint> path, allPoints;
     private WayPoint a ,b;
+    private boolean isFinding;
+    private Long    lastUpdate;
+    private Node    navNode;
     
     public Finder(SimpleApplication app, Node navNode) {
         
-        Box b      = new Box(1,1,1);
-        Geometry g = new Geometry("Box", b);
-        Material m = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        Box b        = new Box(1,1,1);
+        Geometry g   = new Geometry("Box", b);
+        Material m   = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        lastUpdate   = System.currentTimeMillis();
+        this.navNode = navNode;
         
-        initPoints(navNode);
         m.setColor("Color", ColorRGBA.Cyan);
         g.setMaterial(m);
         attachChild(g);
         
     }
     
-    private void initPoints(Node navNode) {
-    
+    private void initPoints() {
+        
+        allPoints = new ArrayList();
+        
         for (int i = 0; i < navNode.getChildren().size(); i++) {
             WayPoint wp = (WayPoint) navNode.getChild(i);
             allPoints.add(wp);
@@ -50,84 +56,80 @@ public class Finder extends Node {
     }
     
     public void pathTo(Vector3f destination) {
-        updatePath(destination);
+        finalPoint = destination;
+        isFinding  = true;
+        updatePath();
     }
     
-    private ArrayList<WayPoint> getPath(ArrayList<WayPoint> points, Vector3f origin, Vector3f destination) {
-     
+    private WayPoint getClosest(WayPoint wp) {
+    
+        WayPoint closest  = wp;
+        float    distance = 9999;
+        
+        for (WayPoint point: allPoints) {
+            
+            if (point.getLocalTranslation().distance(wp.getLocalTranslation()) < distance) {
+                
+                if (point == wp)
+                    continue;
+                
+                distance = point.getLocalTranslation().distance(wp.getWorldTranslation());
+                closest  = point;
+                
+            }
+            
+        }
+        
+        return closest;
+        
+    }
+    
+    private ArrayList<WayPoint> getPath(Vector3f origin) {
+
         if (a == null && b == null) {
             
             a = new WayPoint();
             b = new WayPoint();
             
-            a.setLocalTranslation(origin);
-            b.setLocalTranslation(destination);
-        
-            a.getNeighbors().set(0, b);
-            b.getNeighbors().set(0, a);
+            a.setName("Start");
+            b.setName("Finish");
             
-            for (WayPoint point : points) {
-
-                float and     = a.getLocalTranslation().distance(a.getNeighbors().get(0).getLocalTranslation());
-                float bnd     = b.getLocalTranslation().distance(b.getNeighbors().get(0).getLocalTranslation());
-                
-                float adist = a.getLocalTranslation().distance(point.getLocalTranslation());
-                float bdist = destination.distance(point.getLocalTranslation());
-                
-                if (and > adist) {
-                    a.getNeighbors().set(0, point);
-                }
-                
-                if (bnd > bdist) {
-                    b.getNeighbors().set(0, point);
-                }
-
-            }
+            a.setLocalTranslation(origin);
+            b.setLocalTranslation(finalPoint);
+        
+            allPoints.add(a);
+            allPoints.add(b);
+            
+            a.getNeighbors().add(getClosest(a));
+            b.getNeighbors().add(getClosest(b));
+            
+            //Original Destination is a Point
+            goodPoints.add(a);
             
         }
         
-        while (!a.getNeighbors().contains(b)) {
+        WayPoint prevA = a;
+        WayPoint newA  = new WayPoint();         
         
-            WayPoint prevA = a;
-            WayPoint prevB = b;
-            WayPoint newA = new WayPoint();
-            WayPoint newB = new WayPoint();
+        while (!b.getNeighbors().contains(a)) {
             
-            float dist = a.getLocalTranslation().distance(b.getLocalTranslation());
+            float dist  = origin.distance(finalPoint);
             
             for (WayPoint point : a.getNeighbors()) {
-
+                
                 if (badPoints.contains(point))
                     continue;
                 
-                float newdist = a.getLocalTranslation().distance(point.getLocalTranslation());
+                float checkdist = finalPoint.distance(point.getLocalTranslation());
 
-                if (dist > newdist) {
+                if (dist > checkdist) {
                     newA  = point;
-                    dist  = newdist;
+                    dist  = checkdist;
                 }
                 
             }
             
             a = newA;
-            
-            dist = a.getLocalTranslation().distance(b.getLocalTranslation());
-            
-            for (WayPoint point : b.getNeighbors()) {
-
-                if (badPoints.contains(point))
-                    continue;
-                
-                float newdist = b.getLocalTranslation().distance(point.getLocalTranslation());
-                
-                if (dist > newdist) {
-                    newB  = point;
-                    dist  = newdist;
-                }
-                
-            }            
-            
-            b = newB;
             
             if (goodPoints.contains(a)) {
                 badPoints.add(prevA);
@@ -137,41 +139,49 @@ public class Finder extends Node {
                 goodPoints.add(a);
             }
             
-            if (goodPoints.contains(b)) {
-                badPoints.add(prevB);
-            }            
-            
-            else {
-                goodPoints.add(b);
-            }
-            
             origin      = a.getLocalTranslation();
-            destination = b.getLocalTranslation();
             
-            return getPath(points, origin, destination);
+            return getPath(origin);
             
         }
+        
+        //Destination Goes Last in the List
+        goodPoints.add(b);
         
         return goodPoints;
         
     }
     
-    private void updatePath(Vector3f dest) {
+    private void updatePath() {
+        initPoints();
         a          = null;
         b          = null;
-        goodPoints = null;
-        badPoints  = null;
-        path       = getPath(allPoints, this.getLocalTranslation(), dest);
+        goodPoints = new ArrayList();
+        badPoints  = new ArrayList();
+        path       = getPath(this.getLocalTranslation());
+        lastUpdate = System.currentTimeMillis();
     }
     
     public void update(float tpf) {
-    
+        
+        if (!isFinding)
+            return;
+        
         WayPoint wp = path.get(0);
-        moveDir     = wp.getLocalTranslation().subtract(getLocalTranslation());
+        moveDir     = wp.getLocalTranslation().subtract(getLocalTranslation());        
+        
+        if (System.currentTimeMillis() - lastUpdate > 3000) {
+            pathTo(finalPoint);
+        }
+        
+        if (getLocalTranslation().distance(finalPoint) < 3) {
+            System.out.println("At Destination");
+            isFinding = false;
+        }
         
         if (getLocalTranslation().distance(wp.getLocalTranslation()) < 3) {
             path.remove(0);
-        }
+        }        
         
         move(moveDir.normalize().mult(3).mult(tpf));
         
