@@ -10,8 +10,10 @@ import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import jme3tools.optimize.GeometryBatchFactory;
 import navtools.AppManager;
@@ -30,8 +32,10 @@ public class Gui {
     private final float yOrigin;
     private Node        meshButton;
     private Node        pointButton;
-    private BitmapText infoText;
-    private String     mode;
+    private BitmapText  infoText;
+    private String      mode;
+    private Node        lineSwitch;
+    private boolean     showLines;
     
     public Gui(SimpleApplication app) {
         
@@ -42,10 +46,12 @@ public class Gui {
         yOrigin      = h/4;
         screenWidth  = w - w/50 - w/50;
         screenHeight = h - h/4 - h/50;
+        showLines    = false;
         
         createInfoText();
         createFrame();
         createCrosshair();
+        createLineSwitch();
         setMode("Mesh");
         
     } 
@@ -60,6 +66,48 @@ public class Gui {
         float xPos = screenWidth/2 - infoText.getLineWidth()/2 + xOrigin;
         float yPos = screenHeight + yOrigin - infoText.getLineHeight();
         infoText.setLocalTranslation(xPos, yPos, 1);
+    }
+    
+    private void createLineSwitch() {
+        
+        BitmapFont font = app.getAssetManager().loadFont("Interface/Fonts/Default.fnt");
+        BitmapText text = new BitmapText(font, false);
+        lineSwitch      = new Node();
+        Box  box        = new Box(Display.getWidth()/10, Display.getHeight()/10, 1);
+        Geometry g      = new Geometry("Box", box);
+        Material m      = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        
+        Box  sbox       = new Box(Display.getWidth()/10/2, Display.getHeight()/10/5, 1);
+        Geometry sg     = new Geometry("Switch", sbox);
+        Material sm     = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");        
+        
+        sm.setColor("Color", ColorRGBA.Green);
+        sm.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));        
+        
+        m.setColor("Color", ColorRGBA.Gray);
+        m.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));
+        
+        text.setText("Show Lines");
+        
+        lineSwitch.attachChild(g);
+        lineSwitch.attachChild(sg);
+        lineSwitch.attachChild(text);
+        
+        app.getGuiNode().attachChild(lineSwitch);
+        
+        g.setMaterial(m);
+        sg.setMaterial(sm);
+        
+        float yPos = Display.getHeight()/8;
+        float xPos = Display.getWidth()/2;
+        
+        float syPos = Display.getHeight()/10/4;
+        
+        sg.setLocalTranslation(0, -syPos, 1);
+        
+        text.setLocalTranslation(Display.getWidth()/20-text.getLineWidth(), Display.getHeight()/20 + text.getLineHeight(), 1); 
+        lineSwitch.setLocalTranslation(xPos, yPos, 1); 
+        
     }
     
     private void createInfoText() {
@@ -188,7 +236,7 @@ public class Gui {
         red.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));
         blue.setTexture("ColorMap", app.getAssetManager().loadTexture("Models/well/Rusted Metal.png"));
         
-        if (meshButtonCheck()) {
+        if (buttonCheck(meshButton)) {
             
             if (mode.equals("Mesh"))
                 return;
@@ -200,7 +248,7 @@ public class Gui {
             
         }
         
-        else if (pointButtonCheck()) {
+        else if (buttonCheck(pointButton)) {
             
             if (mode.equals("WayPoint"))
                 return;            
@@ -214,18 +262,38 @@ public class Gui {
             
         }
         
+        else if (buttonCheck(lineSwitch)) {
+            
+            float   yPos    = Display.getHeight()/10/4;
+            Spatial lSwitch = lineSwitch.getChild("Switch");
+            
+            if (showLines) {
+                showLines = false;
+                lSwitch.setLocalTranslation(0,-yPos,1);
+
+            }
+            
+            else {
+                showLines = true;
+                lSwitch.setLocalTranslation(0,yPos,1);
+            }
+            
+            app.getStateManager().getState(AppManager.class).getSceneManager().setShowLines(showLines);
+            
+        }
+        
     }
     
-    private boolean meshButtonCheck() {
+    private boolean buttonCheck(Spatial button) {
         
         float x    = app.getInputManager().getCursorPosition().x;
         float y    = app.getInputManager().getCursorPosition().y;
         
-        float yMax = meshButton.getLocalTranslation().y + Display.getHeight()/10;
-        float yMin = meshButton.getLocalTranslation().y - Display.getHeight()/10;
+        float yMax = button.getLocalTranslation().y + Display.getHeight()/10;
+        float yMin = button.getLocalTranslation().y - Display.getHeight()/10;
         
-        float xMax = meshButton.getLocalTranslation().x + Display.getHeight()/10;
-        float xMin = meshButton.getLocalTranslation().x - Display.getHeight()/10;
+        float xMax = button.getLocalTranslation().x + Display.getHeight()/10;
+        float xMin = button.getLocalTranslation().x - Display.getHeight()/10;
         
         if (x >= xMin && x <= xMax && y >= yMin && y <= yMax) {
             return true;
@@ -234,21 +302,6 @@ public class Gui {
         return false;
         
     }
-    
-    private boolean pointButtonCheck() {
-        
-        float x    = app.getInputManager().getCursorPosition().x;
-        float y    = app.getInputManager().getCursorPosition().y;
-        
-        float yMax = pointButton.getLocalTranslation().y + Display.getHeight()/10;
-        float yMin = pointButton.getLocalTranslation().y - Display.getHeight()/10;
-        
-        float xMax = pointButton.getLocalTranslation().x + Display.getHeight()/10;
-        float xMin = pointButton.getLocalTranslation().x - Display.getHeight()/10;
-        
-        return x >= xMin && x <= xMax && y >= yMin && y <= yMax;
-        
-    }    
     
     public void update(float tpf) {
     

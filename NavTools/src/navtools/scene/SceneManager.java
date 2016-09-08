@@ -110,6 +110,10 @@ public class SceneManager  {
         
     } 
     
+    public void setShowLines(boolean show) {
+        wec.setShowLines(show);
+    }
+    
     public void changeMode() {
         wec.changeMode();
     }
