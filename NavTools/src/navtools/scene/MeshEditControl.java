@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mygame;
+package navtools.scene;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.collision.CollisionResults;
@@ -14,6 +14,7 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
+import navtools.mesh.WayPoint;
 
 /**
  *

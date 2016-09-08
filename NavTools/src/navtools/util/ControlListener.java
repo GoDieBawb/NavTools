@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mygame;
+package navtools.util;
 
+import navtools.util.InteractionManager;
 import com.jme3.app.SimpleApplication;
+import navtools.AppManager;
 import org.lwjgl.opengl.Display;
 
 /**

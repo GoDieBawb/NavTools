@@ -1,4 +1,4 @@
-package mygame;
+package navtools.util;
 
 import java.io.File;
 

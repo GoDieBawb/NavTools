@@ -3,8 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mygame;
+package navtools;
 
+import navtools.scene.SceneManager;
+import navtools.util.ControlListener;
+import navtools.util.InteractionManager;
+import navtools.gui.Gui;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
