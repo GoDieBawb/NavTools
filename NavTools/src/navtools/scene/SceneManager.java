@@ -123,6 +123,18 @@ public class SceneManager  {
         
     } 
     
+    public void onClickRelease() {
+        
+        String mode = app.getStateManager().getState(AppManager.class).getGui().getMode();
+        switch(mode) {
+        
+            case "Test":
+                tc.clickRelease();
+            
+        }
+        
+    }
+    
     public TestController getTestController() {
         return tc;
     }

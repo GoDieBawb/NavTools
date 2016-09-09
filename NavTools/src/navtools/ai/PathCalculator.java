@@ -23,6 +23,7 @@ public class PathCalculator {
     private ArrayList<WayPoint> path, allPoints;
     private final Node navNode;
     private int maxPathSize;
+    private boolean debug;
     
     public PathCalculator(Node navNode) {
         this.navNode = navNode;
@@ -45,8 +46,17 @@ public class PathCalculator {
         
     }
     
+    public void setDebug(boolean newDebug) {
+        debug = newDebug;
+    }
+    
     private void makeTree() {
     
+        if (!debug)
+            return;
+        
+        System.out.println("Making Tree::");
+        
         ArrayList<WayPoint> list = new ArrayList(); 
         
         for (int i = 0; i < navNode.getChildren().size(); i++) {
@@ -67,6 +77,8 @@ public class PathCalculator {
             list.add(wp);
             
         }
+        
+        System.out.println("");
         
     }
     
@@ -176,6 +188,9 @@ public class PathCalculator {
     
     private void printPath() {
     
+        if (!debug)
+            return;
+        
         System.out.print("Path: ");
         for (WayPoint wp: path) {
             System.out.print(wp.getName() + " ");

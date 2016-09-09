@@ -296,9 +296,10 @@ public class Gui {
     }
     
     public void click() {
-    
-        Material red    = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        Material blue   = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        
+        TestController tc = app.getStateManager().getState(AppManager.class).getSceneManager().getTestController();
+        Material red      = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        Material blue     = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         red.setColor("Color", ColorRGBA.Red);
         blue.setColor("Color", ColorRGBA.Blue);  
         
@@ -311,6 +312,7 @@ public class Gui {
             if (mode.equals("Test")) {
                 testSwitch.removeFromParent();
                 setMode("WayPoint");
+                tc.stop();
             }
             
             else {
@@ -324,7 +326,7 @@ public class Gui {
         
             if (mode.equals("Test")) {
             
-                TestController tc = app.getStateManager().getState(AppManager.class).getSceneManager().getTestController();
+
                 float yPos        = Display.getHeight()/10/4;
                 
                 if (testGo) {
@@ -345,7 +347,7 @@ public class Gui {
         
         else if (buttonCheck(meshButton)) {
             
-            if (mode.equals("Mesh"))
+            if (mode.equals("Mesh") || mode.equals("Test"))
                 return;
             
             setMode("Mesh");
@@ -357,7 +359,7 @@ public class Gui {
         
         else if (buttonCheck(pointButton)) {
             
-            if (mode.equals("WayPoint"))
+            if (mode.equals("WayPoint") || mode.equals("Test"))
                 return;            
             
             setMode("WayPoint");

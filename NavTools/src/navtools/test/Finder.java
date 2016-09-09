@@ -38,6 +38,7 @@ public class Finder extends Node {
         lastUpdate   = System.currentTimeMillis();
         this.navNode = navNode;
         calc         = new PathCalculator(navNode);
+        calc.setDebug(true);
         m.setColor("Color", ColorRGBA.Cyan);
         g.setMaterial(m);
         attachChild(g);
@@ -50,14 +51,31 @@ public class Finder extends Node {
         path = calc.calculatePath(this.getLocalTranslation(), target.getLocalTranslation());
     }
 
+    public void stop() {
+        isFinding = false;
+    }
+
+    public boolean isFinding() {
+        return isFinding;
+    }
     
     public void update(float tpf) {
         
         if (!isFinding)
             return;
         
-        WayPoint wp         = path.get(0);
-        Vector3f finalPoint = path.get(path.size() - 1).getLocalTranslation();
+        WayPoint wp;
+        
+        //If path is Empty Goal is Target
+        if (path.isEmpty()) {
+            wp = new WayPoint();
+            wp.setLocalTranslation(target.getLocalTranslation());
+        }
+        
+        else {
+            wp         = path.get(0);
+        }
+        
         moveDir             = wp.getLocalTranslation().subtract(getLocalTranslation());        
         
         if (System.currentTimeMillis() - lastUpdate > 1000) {
@@ -65,7 +83,7 @@ public class Finder extends Node {
             lastUpdate = System.currentTimeMillis();
         }
         
-        if (getLocalTranslation().distance(finalPoint) < 1) {
+        if (getLocalTranslation().distance(target.getLocalTranslation()) < 1) {
             System.out.println("At Destination");
             isFinding = false;
         }

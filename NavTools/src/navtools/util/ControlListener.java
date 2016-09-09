@@ -5,7 +5,6 @@
  */
 package navtools.util;
 
-import navtools.util.InteractionManager;
 import com.jme3.app.SimpleApplication;
 import navtools.AppManager;
 import org.lwjgl.opengl.Display;
@@ -86,7 +85,10 @@ public class ControlListener {
     }
     
     private void clickRelease() {
-    
+        
+        if (!app.getInputManager().isCursorVisible()) {
+            app.getStateManager().getState(AppManager.class).getSceneManager().onClickRelease();
+        }
     }
     
     private void rightClickPress() {

@@ -4,10 +4,10 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 
-public class NavTools extends SimpleApplication {
+public class NavMeshEditor extends SimpleApplication {
     
     public static void main(String[] args) {
-        NavTools app = new NavTools();
+        NavMeshEditor app = new NavMeshEditor();
         //AppSettings settings = new AppSettings(true);
         //settings.setFullscreen(true);
         //app.setSettings(settings);
