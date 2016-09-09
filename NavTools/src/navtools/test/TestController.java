@@ -75,7 +75,7 @@ public class TestController {
     }
     
     public void go() {
-        finder.pathTo(goal.getLocalTranslation());
+        finder.pathTo(goal);
         enabled = true;
     }
     
