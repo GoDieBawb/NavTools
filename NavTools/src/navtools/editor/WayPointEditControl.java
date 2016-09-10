@@ -91,7 +91,7 @@ public class WayPointEditControl {
         navNode.collideWith(ray, results);
         
         if (results.getClosestCollision() != null) {
-            selectedWayPoint = (WayPoint) results.getClosestCollision().getGeometry().getParent().getParent();
+            selectedWayPoint = (WayPoint) results.getClosestCollision().getGeometry().getParent();
             colorNeighbors();
         }        
         

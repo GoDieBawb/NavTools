@@ -5,9 +5,13 @@
  */
 package navtools.ai;
 
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import java.util.ArrayList;
+import com.jme3.scene.shape.Sphere;
 import java.util.HashMap;
 
 /**
@@ -21,27 +25,52 @@ public class NavigationNode extends Node {
     private boolean debug;
     
     public NavigationNode() {
-    
+        name = "Navigation Node";
     }
     
     public NavigationNode(Node navNode) {
+        name = "Navigation Node";
         this.loadedNode = navNode;
         initialize();
     }
     
     public void setDebug(boolean newVal, AppStateManager stateManager) {
         
-        debug = true;
+        debug = newVal;
         
         if (debug) {
-            //((SimpleApplication) stateManager.getApplication()).getRootNode().attachChild(loadedNode);
+            showBalls(stateManager);
         }
         
         else {
-            //loadedNode.removeFromParent();
+            hideBalls();
         }
         
     }
+    
+    private void showBalls(AppStateManager stateManager) {
+        
+        for (int i = 0; i < getChildren().size(); i++) {
+        
+            WayPoint  wp       = (WayPoint) getChild(i);
+            Sphere   s         = new Sphere(30, 30, .2f);
+            Geometry geom      = new Geometry("Sphere", s);
+            Material m         = new Material(stateManager.getApplication().getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+            geom.setMaterial(m);
+            m.setColor("Color", ColorRGBA.Red);
+            wp.attachChild(geom);
+        }
+        
+    }
+    
+    private void hideBalls() {
+        
+        for (int i = 0; i < getChildren().size(); i++) {
+            WayPoint  wp       = (WayPoint) getChild(i);
+            wp.detachAllChildren();
+            
+        }
+    }    
     
     private void initialize() {
         
@@ -62,7 +91,7 @@ public class NavigationNode extends Node {
             
         }
         
-        attachModels();
+        //attachModels();
         initNeighbors();
         loadedNode.removeFromParent();
         
@@ -104,6 +133,8 @@ public class NavigationNode extends Node {
     
     public void debugNeighbors() {
     
+        System.out.println("Debugging Neighbors...");
+        
         for (int i = 0; i < getChildren().size(); i++) {
             WayPoint  wp       = (WayPoint) getChild(i);
             System.out.println(wp.getName() + ": " + wp.getNeighbors());
