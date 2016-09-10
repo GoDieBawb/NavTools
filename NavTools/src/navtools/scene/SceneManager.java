@@ -7,10 +7,12 @@ package navtools.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetNotFoundException;
 import com.jme3.light.AmbientLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
 import java.util.ArrayList;
+import java.util.Scanner;
 import navtools.ai.NavigationNode;
 import navtools.ai.WayPoint;
 import navtools.editor.EditControlManager;
@@ -33,23 +35,60 @@ public class SceneManager  {
         this.app = (SimpleApplication) app;
         fw       = new FileWalker();
         createLight();
-        loadScene("Town");
+        promptScene();
         initNavNode();
         //Control Manager Needs Above Methods
         ecm = new EditControlManager(this.app, this);
         
     }
     
-    private void loadScene(String path) {
+    private void promptScene() {
         
-        sceneName  = path;
+        app.getInputManager().setCursorVisible(true);
+        System.out.print("Enter Scene Path: ");
+        
+        Scanner scanner = new Scanner(System.in);
+        String  input   = scanner.nextLine();
+        
+        String  command = input.toLowerCase();
+        
+        switch (command) {
+            case "q":
+                app.stop();
+                break;
+            case "quit":
+                app.stop();
+                break;
+            case "exit":
+                app.stop();
+                break;
+            default:
+                break;
+        }
+        
+        try {
+            loadScene(input);
+        }
+        
+        catch (Exception e) {
+            System.out.println("Asset Not Found: " + input);
+            promptScene();
+        }
+        
+        app.getInputManager().setCursorVisible(false);
+        
+    }
+    
+    private void loadScene(String path) throws Exception {
+        
+        scene      = (Node) app.getAssetManager().loadModel(path);
         String[] p = path.split("/");
         path       = p[p.length-1];
         path       = path.split("\\.")[0];
-        path       = fw.walk("assets/Scenes", path);
+        path       = fw.walk("assets/", path);
         path       = path.split("assets/")[1];
         path       = path.replace("data", "");
-        scene      = (Node) app.getAssetManager().loadModel(path);
+        sceneName  = path;
         app.getRootNode().attachChild(scene);
         
     }

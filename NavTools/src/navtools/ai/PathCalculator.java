@@ -59,7 +59,7 @@ public class PathCalculator {
         if (!debug)
             return;
         
-        System.out.println("Making Tree::");
+        System.out.println("Making Tree:");
         
         ArrayList<WayPoint> list = new ArrayList(); 
         
@@ -81,8 +81,6 @@ public class PathCalculator {
             list.add(wp);
             
         }
-        
-        System.out.println("");
         
     }
     
@@ -172,9 +170,14 @@ public class PathCalculator {
             }
             
             if (goodPoints.size() > maxPathSize) {
-                System.out.println("Path Error: ");
-                System.out.println("Returning Previous Path...");
+                
+                if (debug) {
+                    System.out.println("Path Error: ");
+                    System.out.println("Returning Previous Path...");
+                }
+                
                 return path;
+                
             }
             
             origin = a.getLocalTranslation();

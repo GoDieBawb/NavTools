@@ -38,7 +38,7 @@ public class TestController {
         scene        = sm.getScene();
         finderNode   = new Node();
         calc         = new PathCalculator(sm.getNavNode());
-        calc.setDebug(true);        
+        calc.setDebug(false);        
         app.getRootNode().attachChild(finderNode);
         initGoal();
     }
@@ -132,6 +132,7 @@ public class TestController {
             
             app.getRootNode().attachChild(goal);
             goal.setLocalTranslation(results.getClosestCollision().getContactPoint());
+            
         }
     }
     

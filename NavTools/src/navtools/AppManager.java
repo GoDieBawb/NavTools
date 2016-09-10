@@ -36,10 +36,6 @@ public class AppManager extends AbstractAppState {
         cl       = new ControlListener(this.app, im);  
     }
     
-    public void initStuff() {
-    
-    }
-    
     public SceneManager getSceneManager() {
         return sm;
     }
