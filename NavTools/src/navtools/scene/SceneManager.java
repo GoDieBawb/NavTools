@@ -5,15 +5,15 @@
  */
 package navtools.scene;
 
-import navtools.mesh.WayPointEditControl;
-import navtools.mesh.MeshEditControl;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.AmbientLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
-import navtools.AppManager;
-import navtools.test.TestController;
+import java.util.ArrayList;
+import navtools.ai.NavigationNode;
+import navtools.ai.WayPoint;
+import navtools.editor.EditControlManager;
 import navtools.util.FileWalker;
 
 /**
@@ -24,11 +24,10 @@ public class SceneManager  {
     
     private final SimpleApplication   app;
     private final FileWalker          fw;
-    private final MeshEditControl     mec;
-    private final WayPointEditControl wec;
-    private final TestController      tc;
+    private final EditControlManager  ecm;
     private Node                      scene;
-    private Node                      navNode;
+    private NavigationNode            navNode;
+    private String                    sceneName;
     
     public SceneManager(Application app) {
         this.app = (SimpleApplication) app;
@@ -36,13 +35,14 @@ public class SceneManager  {
         createLight();
         loadScene("Town");
         initNavNode();
-        mec = new MeshEditControl(this.app, scene);
-        wec = new WayPointEditControl(this.app, scene);
-        tc  = new TestController(this.app, navNode);
+        //Control Manager Needs Above Methods
+        ecm = new EditControlManager(this.app, this);
+        
     }
     
     private void loadScene(String path) {
         
+        sceneName  = path;
         String[] p = path.split("/");
         path       = p[p.length-1];
         path       = path.split("\\.")[0];
@@ -64,91 +64,78 @@ public class SceneManager  {
     private void initNavNode() {
         
         if (scene.getChild("Navigation Node") == null) {
-            navNode = new Node();
+            navNode = new NavigationNode();
             navNode.setName("Navigation Node");
             scene.attachChild(navNode);
         }
         
         else {
-            navNode = (Node) scene.getChild("Navigation Node");
+           Node sceneNavNode = (Node) scene.getChild("Navigation Node");
+           navNode           = new NavigationNode(sceneNavNode);
+           navNode.setDebug(true, app.getStateManager());
+           app.getRootNode().attachChild(navNode);
         }
         
     }
     
-    public Node getNavNode() {
+    public EditControlManager getControlManager() {
+        return ecm;
+    }
+    
+    public NavigationNode getNavNode() {
         return navNode;
     }
     
-    public void onClick() {
-        
-        String mode = app.getStateManager().getState(AppManager.class).getGui().getMode();
-        
-        switch(mode) {
-        
-            case "Mesh":
-                mec.click();
-                break;
+    public String getSceneName() {
+        return sceneName;
+    }
+    
+    public Node getScene() {
+        return scene;
+    }
+    
+    public void update(float tpf) {
+        ecm.update(tpf);
+    }
+    
+    public void sortWayPoints() {
+        char    letter             = 'A';
+        WayPoint startPoint        = (WayPoint) navNode.getChild(0);
+        ArrayList<WayPoint> sorted = new ArrayList();
+        nameNeighbors(startPoint, letter, sorted);
+        addNeighborData();
+    }    
+    
+    private void nameNeighbors(WayPoint point, char letter, ArrayList<WayPoint> sorted) {
+
+        for (WayPoint neighbor: point.getNeighbors()) {
             
-            case "WayPoint":
-                wec.click();
-                break;
-                
-            case "Test":
-                tc.click();
-                break;  
-                
+            if (!sorted.contains(neighbor)) {
+                sorted.add(neighbor);
+                neighbor.setName(Character.toString(letter));
+                letter++;
+                nameNeighbors(neighbor, letter,sorted);
+            }
+            
         }
         
     }
     
-    public void onRightClick() {
+    public void addNeighborData() {
         
-        String mode = app.getStateManager().getState(AppManager.class).getGui().getMode();
-        
-        switch(mode) {
-        
-            case "Mesh":
-                mec.rightClick();
-                break;
-                
-            case "WayPoint":
-                wec.rightClick();
-                break;  
-                
-            case "Test":
-                tc.rightClick();
-                break;                  
+        for (int i = 0; i < navNode.getChildren().size(); i++) {
+            
+            String data = "";
+            WayPoint wp = (WayPoint) navNode.getChildren().get(i);
+            
+            for (WayPoint neighbor: wp.getNeighbors()) {
+                data = data + neighbor.getName() + " ";
+            }
+            
+            wp.setUserData("Neighbors", data);
             
         }
         
     } 
-    
-    public void onClickRelease() {
-        
-        String mode = app.getStateManager().getState(AppManager.class).getGui().getMode();
-        switch(mode) {
-        
-            case "Test":
-                tc.clickRelease();
-            
-        }
-        
-    }
-    
-    public TestController getTestController() {
-        return tc;
-    }
-    
-    public void setShowLines(boolean show) {
-        wec.setShowLines(show);
-    }
-    
-    public void changeMode() {
-        wec.changeMode();
-    }
-    
-    public void update(float tpf) {
-        tc.update(tpf);
-    }
     
 }

@@ -6,9 +6,7 @@
 package navtools.ai;
 
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Node;
 import java.util.ArrayList;
-import navtools.mesh.WayPoint;
 
 /**
  *
@@ -21,11 +19,15 @@ public class PathCalculator {
     private ArrayList<WayPoint> badPoints  = new ArrayList();
     private ArrayList<WayPoint> goodPoints = new ArrayList();
     private ArrayList<WayPoint> path, allPoints;
-    private final Node navNode;
-    private int maxPathSize;
+    private NavigationNode      navNode;
+    private int     maxPathSize;
     private boolean debug;
     
-    public PathCalculator(Node navNode) {
+    public PathCalculator(NavigationNode navNode) {
+        this.navNode = navNode;
+    }
+    
+    public void setNavNode(NavigationNode navNode) {
         this.navNode = navNode;
     }
     
@@ -36,10 +38,12 @@ public class PathCalculator {
         
         
         for (int i = 0; i < navNode.getChildren().size(); i++) {
+            
             WayPoint wp = (WayPoint) navNode.getChild(i);
             wp.setName(Character.toString(letter));
             allPoints.add(wp);
             letter++;
+
         }
         
         //makeTree();

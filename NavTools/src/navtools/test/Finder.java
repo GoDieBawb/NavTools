@@ -13,7 +13,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import java.util.ArrayList;
-import navtools.mesh.WayPoint;
+import navtools.ai.WayPoint;
 import navtools.ai.PathCalculator;
 
 /**
@@ -27,28 +27,31 @@ public class Finder extends Node {
     private boolean              isFinding;
     private Long                 lastUpdate;
     private final Node           navNode;
-    private final PathCalculator calc;
+    private final PathCalculator calc;  
     private Node                 target;
     
-    public Finder(SimpleApplication app, Node navNode) {
+    public Finder(SimpleApplication app, Node navNode, PathCalculator calc) {
         
         Box b        = new Box(1,1,1);
         Geometry g   = new Geometry("Box", b);
         Material m   = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         lastUpdate   = System.currentTimeMillis();
         this.navNode = navNode;
-        calc         = new PathCalculator(navNode);
-        calc.setDebug(true);
+        this.calc    = calc;
         m.setColor("Color", ColorRGBA.Cyan);
         g.setMaterial(m);
         attachChild(g);
         
     }
     
+    private void updatePath() {
+        path = calc.calculatePath(getLocalTranslation(), target.getLocalTranslation());
+    }
+    
     public void pathTo(Node target) {
         this.target = target;
-        isFinding  = true;
-        path = calc.calculatePath(this.getLocalTranslation(), target.getLocalTranslation());
+        isFinding   = true;
+        updatePath();
     }
 
     public void stop() {
@@ -73,10 +76,10 @@ public class Finder extends Node {
         }
         
         else {
-            wp         = path.get(0);
+            wp = path.get(0);
         }
         
-        moveDir             = wp.getLocalTranslation().subtract(getLocalTranslation());        
+        moveDir = wp.getLocalTranslation().subtract(getLocalTranslation());        
         
         if (System.currentTimeMillis() - lastUpdate > 1000) {
             pathTo(target);

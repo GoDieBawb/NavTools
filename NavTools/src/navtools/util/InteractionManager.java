@@ -20,7 +20,7 @@ import com.jme3.input.controls.KeyTrigger;
 public class InteractionManager implements ActionListener {
 
     private SimpleApplication app;    
-    private boolean  click=false, rightClick=false, cursor=false;
+    private boolean  click=false, rightClick=false, cursor=false, export=false, sort=false;
     
     public InteractionManager(SimpleApplication app) {
         this.app = app;
@@ -34,9 +34,13 @@ public class InteractionManager implements ActionListener {
         inputManager.addListener(this, "Click");
         inputManager.addListener(this, "RightClick");
         inputManager.addListener(this, "Cursor");
+        inputManager.addListener(this, "Export");
+        inputManager.addListener(this, "Sort");
         inputManager.addMapping("Click",      new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("RightClick", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT)); 
         inputManager.addMapping("Cursor", new KeyTrigger(KeyInput.KEY_E)); 
+        inputManager.addMapping("Export", new KeyTrigger(KeyInput.KEY_F9));
+        inputManager.addMapping("Sort", new KeyTrigger(KeyInput.KEY_F1));
         
     }
     
@@ -54,6 +58,12 @@ public class InteractionManager implements ActionListener {
             case "Cursor":
                 cursor = isPressed;
                 break;
+            case "Export":
+                export = isPressed;
+                break;      
+            case "Sort":
+                sort = isPressed;
+                break;                    
             default:
                 break;       
         
@@ -74,6 +84,12 @@ public class InteractionManager implements ActionListener {
                 
             case "Cursor":
                 return cursor;
+                
+            case "Export":
+                return export;                
+                
+            case "Sort":
+                return sort;                  
                 
             default:
                 return false;

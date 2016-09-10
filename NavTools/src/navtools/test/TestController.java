@@ -14,6 +14,8 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
+import navtools.ai.PathCalculator;
+import navtools.scene.SceneManager;
 
 /**
  *
@@ -21,19 +23,22 @@ import com.jme3.scene.shape.Sphere;
  */
 public class TestController {
     
-    private final Node        finderNode;
-    private final Node        navNode;
-    private final Node        scene;
-    private SimpleApplication app;
-    private Node              goal;
-    private boolean           enabled;
-    private boolean           isClick;
+    private final Node              finderNode;
+    private final SceneManager      sm;
+    private final Node              scene;
+    private final PathCalculator    calc;    
+    private final SimpleApplication app;
+    private Node                    goal;
+    private boolean                 enabled;
+    private boolean                 isClick;
     
-    public TestController(SimpleApplication app, Node navNode) {
+    public TestController(SimpleApplication app, SceneManager sm) {
         this.app     = app;
-        scene        = navNode.getParent();
+        this.sm      = sm;
+        scene        = sm.getScene();
         finderNode   = new Node();
-        this.navNode = navNode;
+        calc         = new PathCalculator(sm.getNavNode());
+        calc.setDebug(true);        
         app.getRootNode().attachChild(finderNode);
         initGoal();
     }
@@ -74,18 +79,20 @@ public class TestController {
     
     public void rightClick() {
         
-        Camera   cam             = app.getCamera();
-        Ray      ray             = new Ray(cam.getLocation(), cam.getDirection());
+        Camera           cam      = app.getCamera();
+        Ray              ray     = new Ray(cam.getLocation(), cam.getDirection());
         CollisionResults results = new CollisionResults();        
         
         app.getRootNode().collideWith(ray, results);
         
         if (results.getClosestCollision() != null) {
             
-            if (results.getClosestCollision().getGeometry().getParent() instanceof Finder)
+            if (results.getClosestCollision().getGeometry().getParent() instanceof Finder) {
                 results.getClosestCollision().getGeometry().getParent().removeFromParent();
+                return;
+            }
             
-            Finder finder   = new Finder(app, navNode);
+            Finder finder   = new Finder(app, sm.getNavNode(), calc);
             
             finderNode.attachChild(finder);
             finder.setLocalTranslation(results.getClosestCollision().getContactPoint());
@@ -99,6 +106,7 @@ public class TestController {
     
     public void go() {
         enabled = true;
+        calc.setNavNode(sm.getNavNode());
         startFinders();
     }
     

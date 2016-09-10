@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package navtools.mesh;
+package navtools.ai;
 
 import com.jme3.scene.Node;
 import java.util.ArrayList;

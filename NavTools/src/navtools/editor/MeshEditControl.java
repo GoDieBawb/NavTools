@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package navtools.mesh;
+package navtools.editor;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.collision.CollisionResults;
@@ -14,7 +14,8 @@ import com.jme3.renderer.Camera;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Sphere;
-import navtools.mesh.WayPoint;
+import navtools.ai.WayPoint;
+import navtools.scene.SceneManager;
 
 /**
  *
@@ -24,10 +25,12 @@ public class MeshEditControl {
     
     private final SimpleApplication app;
     private       Node              scene;
+    private       SceneManager      sm;
     
-    public MeshEditControl(SimpleApplication app, Node scene) {
-        this.app = app;
-        this.scene = scene;
+    public MeshEditControl(SimpleApplication app, SceneManager sm) {
+        this.app   = app;
+        this.sm    = sm;
+        scene      = sm.getScene();
     }
     
     public void setScene(Node newScene) {
@@ -36,7 +39,7 @@ public class MeshEditControl {
     
     public void click() {
         
-        Node     navNode         = (Node) scene.getChild("Navigation Node");
+        Node     navNode         = sm.getNavNode();
         WayPoint waypoint        = new WayPoint();
         Sphere   s               = new Sphere(30, 30, .2f);
         Geometry geom            = new Geometry("Sphere", s);
@@ -60,7 +63,7 @@ public class MeshEditControl {
     
     public void rightClick() {
         
-        Node     navNode         = (Node) scene.getChild("Navigation Node");   
+        Node     navNode         = sm.getNavNode();   
         Camera   cam             = app.getCamera();
         Ray      ray             = new Ray(cam.getLocation(), cam.getDirection());
         CollisionResults results = new CollisionResults();

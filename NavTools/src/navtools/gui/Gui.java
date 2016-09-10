@@ -177,7 +177,7 @@ public class Gui {
         float yPos = Display.getHeight() - Display.getHeight()/20 - Display.getHeight()/50;
         float xPos = Display.getWidth() - Display.getWidth()/10 - Display.getWidth()/50;   
              
-        text.setLocalTranslation(Display.getWidth()/20-text.getLineWidth(), Display.getHeight()/20 - text.getLineHeight(), 1);        
+        text.setLocalTranslation(Display.getWidth()/20 - text.getLineWidth()*1.5f, Display.getHeight()/20 - text.getLineHeight(), 1);        
         testButton.setLocalTranslation(xPos, yPos, 1);        
         
     }    
@@ -191,7 +191,7 @@ public class Gui {
         Geometry g      = new Geometry("Box", box);
         Material m      = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         
-        Box  sbox       = new Box(Display.getWidth()/10/2, Display.getHeight()/10/5, 1);
+        Box     sbox    = new Box(Display.getWidth()/10/2, Display.getHeight()/10/5, 1);
         Geometry sg     = new Geometry("Switch", sbox);
         Material sm     = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");        
         
@@ -217,7 +217,7 @@ public class Gui {
         
         sg.setLocalTranslation(0, -syPos, 1);
         
-        text.setLocalTranslation(Display.getWidth()/20-text.getLineWidth(), Display.getHeight()/20 + text.getLineHeight(), 1); 
+        text.setLocalTranslation(Display.getWidth()/20 - text.getLineWidth()*1.25f, Display.getHeight()/20 + text.getLineHeight(), 1); 
         testSwitch.setLocalTranslation(xPos, yPos, 1); 
         
     }    
@@ -297,7 +297,7 @@ public class Gui {
     
     public void click() {
         
-        TestController tc = app.getStateManager().getState(AppManager.class).getSceneManager().getTestController();
+        TestController tc = app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().getTestController();
         Material red      = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         Material blue     = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         red.setColor("Color", ColorRGBA.Red);
@@ -353,7 +353,7 @@ public class Gui {
             setMode("Mesh");
             meshButton.getChild(0).setMaterial(red);
             pointButton.getChild(0).setMaterial(blue);
-            app.getStateManager().getState(AppManager.class).getSceneManager().changeMode();
+            app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().changeMode();
             
         }
         
@@ -366,8 +366,8 @@ public class Gui {
             
             meshButton.getChild(0).setMaterial(blue);
             pointButton.getChild(0).setMaterial(red);
-            app.getStateManager().getState(AppManager.class).getSceneManager().changeMode();
-            app.getStateManager().getState(AppManager.class).getSceneManager().changeMode();
+            app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().changeMode();
+            app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().changeMode();
             
         }
         
@@ -387,7 +387,7 @@ public class Gui {
                 lSwitch.setLocalTranslation(0,yPos,1);
             }
             
-            app.getStateManager().getState(AppManager.class).getSceneManager().setShowLines(showLines);
+            app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().setShowLines(showLines);
             
         }
         

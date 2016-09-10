@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package navtools.mesh;
+package navtools.editor;
 
+import navtools.ai.WayPoint;
 import com.jme3.app.SimpleApplication;
 import com.jme3.collision.CollisionResults;
 import com.jme3.material.Material;
@@ -17,6 +18,9 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import java.util.ArrayList;
+import navtools.AppManager;
+import navtools.ai.WayPoint;
+import navtools.scene.SceneManager;
 
 /**
  *
@@ -30,11 +34,13 @@ public class WayPointEditControl {
     private Material          red, green, yellow;
     private final Node        lineNode;
     private boolean           showAllLines;
+    private SceneManager      sm;
     
-    public WayPointEditControl(SimpleApplication app, Node scene) {
+    public WayPointEditControl(SimpleApplication app, SceneManager sm) {
         this.app   = app;
-        this.scene = scene;
+        scene      = sm.getScene();
         lineNode   = new Node();
+        this.sm    = sm;
         app.getRootNode().attachChild(lineNode);
         initMaterials();
     }
@@ -77,7 +83,7 @@ public class WayPointEditControl {
     
     public void click() {
         
-        Node     navNode         = (Node) scene.getChild("Navigation Node");
+        Node     navNode         = sm.getNavNode();
         Camera   cam             = app.getCamera();
         Ray      ray             = new Ray(cam.getLocation(), cam.getDirection());
         CollisionResults results = new CollisionResults();
@@ -85,7 +91,7 @@ public class WayPointEditControl {
         navNode.collideWith(ray, results);
         
         if (results.getClosestCollision() != null) {
-            selectedWayPoint = (WayPoint) results.getClosestCollision().getGeometry().getParent();
+            selectedWayPoint = (WayPoint) results.getClosestCollision().getGeometry().getParent().getParent();
             colorNeighbors();
         }        
         
@@ -93,7 +99,7 @@ public class WayPointEditControl {
     
     public void rightClick() {
         
-        Node     navNode         = (Node) scene.getChild("Navigation Node");   
+        Node     navNode         = sm.getNavNode();   
         Camera   cam             = app.getCamera();
         Ray      ray             = new Ray(cam.getLocation(), cam.getDirection());
         CollisionResults results = new CollisionResults();
@@ -127,9 +133,9 @@ public class WayPointEditControl {
     
     }    
     
-    private void clearColors() {
+    public void clearColors() {
         
-        Node navNode = (Node) scene.getChild("Navigation Node");
+        Node navNode = sm.getNavNode();
         
         for (int i = 0; i < navNode.getChildren().size(); i++) {
             WayPoint wp = (WayPoint) navNode.getChildren().get(i);
@@ -175,8 +181,9 @@ public class WayPointEditControl {
     private void drawAllLines() {
     
         clearLines();
+
+        Node navNode = sm.getNavNode();
         
-        Node navNode             = (Node) scene.getChild("Navigation Node");
         ArrayList<WayPoint> list = new ArrayList(); 
         
         for (int i = 0; i < navNode.getChildren().size(); i++) {

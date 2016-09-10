@@ -7,7 +7,6 @@ package navtools.util;
 
 import com.jme3.app.SimpleApplication;
 import navtools.AppManager;
-import org.lwjgl.opengl.Display;
 
 /**
  *
@@ -15,10 +14,9 @@ import org.lwjgl.opengl.Display;
  */
 public class ControlListener {
     
-    private boolean click = false, rightClick = false, cursor = false;
+    private boolean click = false, rightClick = false, cursor = false, export = false, sort = false;
     private final InteractionManager im;
     private final SimpleApplication app;
-    private String sceneName;
     
     public ControlListener(SimpleApplication app, InteractionManager im) {
         this.app = app;
@@ -70,12 +68,38 @@ public class ControlListener {
             cursor = false;
         }
         
+        if (im.getIsPressed("Export")) {
+            export = true;
+        }
+        
+        else if (export) {
+            exportRelease();
+            export = false;
+        }  
+        
+        if (im.getIsPressed("Sort")) {
+            sort = true;
+        }
+        
+        else if (sort) {
+            sortRelease();
+            sort = false;
+        }            
+        
     }
+    
+    private void exportRelease() {
+        app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().onExportRelease();
+    }
+    
+    private void sortRelease() {
+        app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().onSortRelease();
+    }    
     
     private void clickPress() {
         
         if (!app.getInputManager().isCursorVisible()) {
-            app.getStateManager().getState(AppManager.class).getSceneManager().onClick();
+            app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().onClick();
         }
         
         else {
@@ -87,25 +111,18 @@ public class ControlListener {
     private void clickRelease() {
         
         if (!app.getInputManager().isCursorVisible()) {
-            app.getStateManager().getState(AppManager.class).getSceneManager().onClickRelease();
+            app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().onClickRelease();
         }
     }
     
     private void rightClickPress() {
         
         if (!app.getInputManager().isCursorVisible()) {
-            app.getStateManager().getState(AppManager.class).getSceneManager().onRightClick();
-            return;
-        }
-        
-        float y = app.getInputManager().getCursorPosition().y;
-        
-        if (y > Display.getHeight()/4) {
-            app.getStateManager().getState(AppManager.class).getSceneManager().onRightClick();
+            app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().onRightClick();
         }
         
         else {
-        
+            app.getStateManager().getState(AppManager.class).getSceneManager().getControlManager().onRightClick();
         }
     }
     
