@@ -5,7 +5,6 @@
  */
 package navtools.ai;
 
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -90,23 +89,9 @@ public class NavigationNode extends Node {
             attachChild(wayPoint);
             
         }
-        
-        //attachModels();
+
         initNeighbors();
         loadedNode.removeFromParent();
-        
-    }
-    
-    private void attachModels() {
-    
-        for (int i = 0; i < getChildren().size(); i++) {
-            
-            WayPoint wp   = (WayPoint) getChild(i);
-            Node     node = sceneNodes.get(wp.getName());
-            wp.attachChild(node);
-            node.setLocalTranslation(0,0,0);
-            
-        }
         
     }
     

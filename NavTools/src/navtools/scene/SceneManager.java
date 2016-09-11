@@ -7,7 +7,6 @@ package navtools.scene;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
-import com.jme3.asset.AssetNotFoundException;
 import com.jme3.light.AmbientLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
@@ -75,6 +74,7 @@ public class SceneManager  {
             promptScene();
         }
         
+        System.out.println("Scene Loaded");
         app.getInputManager().setCursorVisible(false);
         
     }
