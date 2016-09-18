@@ -10,12 +10,19 @@ import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
+import com.simsilica.lemur.Button;
+import com.simsilica.lemur.Command;
+import com.simsilica.lemur.Container;
+import com.simsilica.lemur.Label;
+import com.simsilica.lemur.TextField;
 import jme3tools.optimize.GeometryBatchFactory;
 import navtools.AppManager;
+import navtools.scene.SceneManager;
 import navtools.test.TestController;
 import org.lwjgl.opengl.Display;
 
@@ -30,6 +37,7 @@ public class Gui {
     private final float screenWidth;
     private final float xOrigin;
     private final float yOrigin;
+    private final SceneManager sm;
     private Node        meshButton;
     private Node        pointButton;
     private Node        testButton;
@@ -50,11 +58,12 @@ public class Gui {
         screenWidth  = w - w/50 - w/50;
         screenHeight = h - h/4 - h/50;
         showLines    = false;
-        
+        sm           = app.getStateManager().getState(AppManager.class).getSceneManager();
         createInfoText();
         createFrame();
         createCrosshair();
         createLineSwitch();
+        createInputField();
         setMode("Mesh");
         
     } 
@@ -69,6 +78,50 @@ public class Gui {
         float xPos = screenWidth/2 - infoText.getLineWidth()/2 + xOrigin;
         float yPos = screenHeight + yOrigin - infoText.getLineHeight();
         infoText.setLocalTranslation(xPos, yPos, 1);
+    }
+    
+    private void createInputField() {
+        
+        // Create a simple container for our elements
+        final Container window = new Container();
+        app.getGuiNode().attachChild(window);
+
+        // Put it somewhere that we will see it
+        // Note: Lemur GUI elements grow down from the upper left corner.
+        window.setLocalTranslation(Display.getWidth()/2 - Display.getWidth()/20, Display.getHeight()*.8f, 0);
+        
+        // Add some elements
+        window.addChild(new Label("Enter Scene Path"));
+        
+        final TextField input = new TextField("");
+        
+        window.addChild(input);
+        
+        Button button = window.addChild(new Button("Enter"));
+        
+        button.addClickCommands(
+                
+            new Command<Button>() {
+                
+                @Override
+                public void execute( Button source ) {
+                    
+                    try {
+                        sm.loadScene(input.getText());
+                        window.removeFromParent();
+                        app.getInputManager().setCursorVisible(false);
+                    }
+                    
+                    catch (Exception e) {
+                        System.out.println("Error Asset Not Found: " + input.getText());
+                    }
+                    
+                }
+                
+            }
+                
+        );     
+        
     }
     
     private void createLineSwitch() {

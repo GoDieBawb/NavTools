@@ -25,7 +25,6 @@ public class TestController {
     
     private final Node              finderNode;
     private final SceneManager      sm;
-    private final Node              scene;
     private final PathCalculator    calc;    
     private final SimpleApplication app;
     private Node                    goal;
@@ -35,7 +34,6 @@ public class TestController {
     public TestController(SimpleApplication app, SceneManager sm) {
         this.app     = app;
         this.sm      = sm;
-        scene        = sm.getScene();
         finderNode   = new Node();
         calc         = new PathCalculator(sm.getNavNode());
         calc.setDebug(false);        
@@ -62,7 +60,7 @@ public class TestController {
         CollisionResults results = new CollisionResults();    
         isClick                  = true;
         
-        scene.collideWith(ray, results);
+        sm.getScene().collideWith(ray, results);
         
         if (results.getClosestCollision() != null) {
             app.getRootNode().attachChild(goal);
@@ -123,7 +121,7 @@ public class TestController {
         CollisionResults results = new CollisionResults();    
         isClick                  = true;
         
-        scene.collideWith(ray, results);
+        sm.getScene().collideWith(ray, results);
         
         if (results.getClosestCollision() != null) {
             

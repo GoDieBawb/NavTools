@@ -3,6 +3,8 @@ package navtools;
 import com.jme3.app.SimpleApplication;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
+import com.simsilica.lemur.GuiGlobals;
+import com.simsilica.lemur.style.BaseStyles;
 
 public class NavMeshEditor extends SimpleApplication {
     
@@ -23,6 +25,9 @@ public class NavMeshEditor extends SimpleApplication {
         flyCam.setMoveSpeed(10);
         cam.setLocation(new Vector3f(0,5,0));
         stateManager.attach(new AppManager());
+        GuiGlobals.initialize(this);
+        GuiGlobals.getInstance().getStyles().setDefaultStyle("glass");
+        BaseStyles.loadGlassStyle();
     }
 
     @Override

@@ -10,12 +10,13 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.light.AmbientLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Node;
+import com.simsilica.lemur.TextField;
 import java.util.ArrayList;
-import java.util.Scanner;
 import navtools.ai.NavigationNode;
 import navtools.ai.WayPoint;
 import navtools.editor.EditControlManager;
 import navtools.util.FileWalker;
+import org.lwjgl.opengl.Display;
 
 /**
  *
@@ -33,53 +34,11 @@ public class SceneManager  {
     public SceneManager(Application app) {
         this.app = (SimpleApplication) app;
         fw       = new FileWalker();
+        ecm      = new EditControlManager(this.app, this);
         createLight();
-        promptScene();
-        initNavNode();
-        //Control Manager Needs Above Methods
-        ecm = new EditControlManager(this.app, this);
-        
     }
     
-    private void promptScene() {
-        
-        app.getInputManager().setCursorVisible(true);
-        System.out.print("Enter Scene Path: ");
-        
-        Scanner scanner = new Scanner(System.in);
-        String  input   = scanner.nextLine();
-        
-        String  command = input.toLowerCase();
-        
-        switch (command) {
-            case "q":
-                app.stop();
-                break;
-            case "quit":
-                app.stop();
-                break;
-            case "exit":
-                app.stop();
-                break;
-            default:
-                break;
-        }
-        
-        try {
-            loadScene(input);
-        }
-        
-        catch (Exception e) {
-            System.out.println("Asset Not Found: " + input);
-            promptScene();
-        }
-        
-        System.out.println("Scene Loaded");
-        app.getInputManager().setCursorVisible(false);
-        
-    }
-    
-    private void loadScene(String path) throws Exception {
+    public void loadScene(String path) throws Exception {
         
         scene      = (Node) app.getAssetManager().loadModel(path);
         String[] p = path.split("/");
@@ -90,6 +49,7 @@ public class SceneManager  {
         path       = path.replace("data", "");
         sceneName  = path;
         app.getRootNode().attachChild(scene);
+        initNavNode();
         
     }
     
